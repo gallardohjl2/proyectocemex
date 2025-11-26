@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="FmConexion.pas"/>
+    <File Path="FmConexion.dfm"/>
+    <File Path="FmConsulta.pas"/>
+    <File Path="FmConsulta.dfm"/>
+    <File Path="FMConsultasDetalle.pas"/>
+    <File Path="FMConsultasDetalle.dfm"/>
+    <File Path="FmEmpleados.pas"/>
+    <File Path="FmEmpleados.dfm"/>
+    <File Path="FmLaboratorio.pas"/>
+    <File Path="FmLaboratorio.dfm"/>
+    <File Path="FmLogin.pas"/>
+    <File Path="FmLogin.dfm"/>
+    <File Path="FmMenu.pas"/>
+    <File Path="FmMenu.dfm"/>
+    <File Path="FmOrdenesFab.pas"/>
+    <File Path="FmOrdenesFab.dfm"/>
+    <File Path="FmPruebas.pas"/>
+    <File Path="FmPruebas.dfm"/>
+    <File Path="FrmConsultas.pas"/>
+    <File Path="FrmConsultas.dfm"/>
+    <File Path="VariablesGlobales.pas"/>
+  </ProjectSortOrder>
+</BorlandProject>

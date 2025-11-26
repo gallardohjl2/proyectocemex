@@ -1,0 +1,96 @@
+object DataModule1: TDataModule1
+  OldCreateOrder = False
+  Left = 1234
+  Top = 244
+  Height = 378
+  Width = 621
+  object ADOConnection1: TADOConnection
+    Connected = True
+    ConnectionString = 
+      'Provider=MSDASQL.1;Password=ADITIVOS;Persist Security Info=True;' +
+      'User ID=ADITIVOS;Data Source=DBAditivos32;Initial Catalog=aditiv' +
+      'os'
+    LoginPrompt = False
+    Left = 232
+    Top = 24
+  end
+  object ADOQuery1: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    Left = 184
+    Top = 144
+  end
+  object ADOTableEmpleados: TADOTable
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    TableName = 'Empleados'
+    Left = 72
+    Top = 96
+  end
+  object ADOQueryLogin: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 80
+    Top = 144
+  end
+  object ADOQueryBuscar: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 272
+    Top = 144
+  end
+  object ADOQueryActualizar: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 272
+    Top = 208
+  end
+  object ADOQueryTotalLab: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM TotalLab')
+    Left = 368
+    Top = 96
+  end
+  object ADOQueryBatchTable: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 376
+    Top = 144
+  end
+  object ADOQueryEmpleados: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM Empleados')
+    Left = 376
+    Top = 216
+    object ADOQueryEmpleadosDataUser: TStringField
+      FieldName = 'DataUser'
+      FixedChar = True
+      Size = 10
+    end
+    object ADOQueryEmpleadosDataPassword: TBlobField
+      FieldName = 'DataPassword'
+    end
+    object ADOQueryEmpleadosNombre: TStringField
+      FieldName = 'Nombre'
+      FixedChar = True
+    end
+  end
+  object ADOQueryEmpleadoUpdate: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 376
+    Top = 288
+  end
+  object ADOQueryOrdenFab: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 480
+    Top = 96
+  end
+end

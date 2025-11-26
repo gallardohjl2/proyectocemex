@@ -1,0 +1,156 @@
+unit FmMenu;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, FmConsulta, StdCtrls, Buttons, ADODB, FmLogin, ExtCtrls, VariablesGlobales;
+
+type
+  TFormMenu = class(TForm)
+    BtnAbrirConsulta: TButton;
+    btnLogin: TSpeedButton;
+    btnLogout: TSpeedButton;
+    Label1: TLabel;
+    LabelName: TLabel;
+    Image1: TImage;
+    Image2: TImage;
+    btnAbrirLaboratorio: TButton;
+    BtnAbrirDetalle: TButton;
+    BtnUsuarios: TButton;
+    BtnAbrirOrdenFab: TButton;
+    Image3: TImage;
+    procedure BtnAbrirConsultaClick(Sender: TObject);
+    procedure btnLoginClick(Sender: TObject);
+    procedure btnLogoutClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure UpdateUserName;
+    procedure btnAbrirLaboratorioClick(Sender: TObject);
+    procedure BtnAbrirDetalleClick(Sender: TObject);
+    procedure BtnUsuariosClick(Sender: TObject);
+    procedure BtnAbrirOrdenFabClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormMenu: TFormMenu;
+
+implementation
+
+uses FmLaboratorio, FMConsultasDetalle, FMEmpleados, FmOrdenesFab, FmPruebas;
+
+{$R *.dfm}
+
+procedure TFormMenu.BtnAbrirConsultaClick(Sender: TObject);
+begin
+  // Crear y mostrar el formulario de consulta
+  FormConsulta := TFormConsulta.Create(nil); // Crear la instancia del formulario
+  try
+    FormConsulta.ShowModal; // Mostrar el formulario como modal
+  finally
+    FormConsulta.Free; // Liberar la memoria al cerrar
+  end;
+end;
+
+procedure TFormMenu.btnLoginClick(Sender: TObject);
+var
+  LoginForm: TFormLogin;
+begin
+  LoginForm := TFormLogin.Create(Self);
+  try
+    if LoginForm.ShowModal = mrOk then
+    begin
+      // Activar botones en el menú después de un login exitoso
+      BtnAbrirConsulta.Enabled := True;
+      btnAbrirLaboratorio.Enabled := True;
+      BtnAbrirDetalle.Enabled := True;
+      BtnUsuarios.Enabled :=True;
+      BtnAbrirOrdenFab.Enabled := True;
+    end;
+  finally
+    LoginForm.Free;
+  end;
+end;
+
+procedure TFormMenu.btnLogoutClick(Sender: TObject);
+begin
+     labelname.Caption := 'none';
+     BtnAbrirConsulta.Enabled := False;
+     btnAbrirLaboratorio.Enabled := False;
+     BtnAbrirDetalle.Enabled := False;
+     BtnUsuarios.Enabled := False;
+     BtnAbrirOrdenFab.Enabled := False;
+end;
+
+procedure TFormMenu.UpdateUserName;
+begin
+     LabelName.Caption := VariablesGlobales.UsuarioActual;
+end;
+
+procedure TFormMenu.FormShow(Sender: TObject);
+begin
+     LabelName.Caption := VariablesGlobales.UsuarioActual;
+end;
+
+procedure TFormMenu.btnAbrirLaboratorioClick(Sender: TObject);
+var
+  LaboratorioForm: TFormLaboratorio;
+begin
+  LaboratorioForm := TFormLaboratorio.Create(Self);
+  try
+    LaboratorioForm.ShowModal;
+  finally
+    LaboratorioForm.Free;
+  end;
+end;
+
+procedure TFormMenu.BtnAbrirDetalleClick(Sender: TObject);
+begin
+  // Crear y mostrar el formulario de consulta
+  FormConsultasDetalle := TFormConsultasDetalle.Create(nil); // Crear la instancia del formulario
+  try
+    FormConsultasDetalle.ShowModal; // Mostrar el formulario como modal
+  finally
+    FormConsultasDetalle.Free; // Liberar la memoria al cerrar
+  end;
+end;
+
+procedure TFormMenu.BtnUsuariosClick(Sender: TObject);
+begin
+  // Crear y mostrar el formulario de consulta
+  FormEmpleados := TFormEmpleados.Create(nil); // Crear la instancia del formulario
+  try
+    FormEmpleados.ShowModal; // Mostrar el formulario como modal
+  finally
+    FormEmpleados.Free; // Liberar la memoria al cerrar
+  end;
+end;
+
+procedure TFormMenu.BtnAbrirOrdenFabClick(Sender: TObject);
+begin
+  // Crear y mostrar el formulario de consulta
+  FormOrdenesFab := TFormOrdenesFab.Create(nil); // Crear la instancia del formulario
+  try
+    FormOrdenesFab.ShowModal; // Mostrar el formulario como modal
+  finally
+    FormOrdenesFab.Free; // Liberar la memoria al cerrar
+  end;
+end;
+
+procedure TFormMenu.Button1Click(Sender: TObject);
+
+begin
+  // Crear y mostrar el formulario de consulta
+  FormPruebas := TFormPruebas.Create(nil); // Crear la instancia del formulario
+  try
+    FormPruebas.ShowModal; // Mostrar el formulario como modal
+  finally
+    FormPruebas.Free; // Liberar la memoria al cerrar
+  end;
+end;
+
+end.

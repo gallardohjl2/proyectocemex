@@ -1,0 +1,245 @@
+unit FMConsultasDetalle;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ExtCtrls, Grids, DBGrids, DB, Buttons;
+
+type
+  TFormConsultasDetalle = class(TForm)
+    Image1: TImage;
+    Label3: TLabel;
+    Image2: TImage;
+    GroupBox1: TGroupBox;
+    Label1: TLabel;
+    EditOrdenFab: TEdit;
+    BtnBuscar: TButton;
+    GroupBox2: TGroupBox;
+    EditDensidad: TEdit;
+    EditSumCantTeorica: TEdit;
+    EditVolTeorico: TEdit;
+    EditSumCantReal: TEdit;
+    EditVolReal: TEdit;
+    Label2: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    GroupBox3: TGroupBox;
+    DataSource1: TDataSource;
+    DBGrid1: TDBGrid;
+    BtnPrimerRegistro: TSpeedButton;
+    BtnRegistroAnterior: TSpeedButton;
+    BtnRegistroSiguiente: TSpeedButton;
+    BtnUltimoRegistro: TSpeedButton;
+    procedure BtnBuscarClick(Sender: TObject);
+    procedure BtnPrimerRegistroClick(Sender: TObject);
+    procedure BtnRegistroAnteriorClick(Sender: TObject);
+    procedure BtnRegistroSiguienteClick(Sender: TObject);
+    procedure BtnUltimoRegistroClick(Sender: TObject);
+    procedure CargarDatosBatchTable(OrdenFab: String);
+    procedure FormShow(Sender: TObject);
+    procedure CargarPrimerRegistro;
+    procedure CargarRegistroAnterior;
+    procedure CargarRegistroSiguiente;
+    procedure CargarUltimoRegistro;
+    procedure ActualizarCamposDesdeTotalLab;
+    procedure EditOrdenFabEnter(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormConsultasDetalle: TFormConsultasDetalle;
+
+implementation
+
+uses FmConexion;
+
+{$R *.dfm}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// B O T O N   B U S C A R
+
+procedure TFormConsultasDetalle.BtnBuscarClick(Sender: TObject);
+var
+  OrdenFab: string;
+begin
+  OrdenFab := Trim(EditOrdenFab.Text);
+
+  if OrdenFab = '' then
+  begin
+    ShowMessage('Por favor, ingrese una Orden de Fabricación válida.');
+    Exit;
+  end;
+
+  // Cargar y filtrar datos en TotalLab
+  DataModule1.ADOQueryTotalLab.Close;
+  DataModule1.ADOQueryTotalLab.SQL.Clear;
+  DataModule1.ADOQueryTotalLab.SQL.Add('SELECT * FROM TotalLab');
+  DataModule1.ADOQueryTotalLab.Open;
+
+  // Buscar el registro específico si existe en el conjunto completo
+  if DataModule1.ADOQueryTotalLab.Locate('OrdenFab', OrdenFab, []) then
+  begin
+    ActualizarCamposDesdeTotalLab;
+  end
+  else
+  begin
+    ShowMessage('No se encontró la Orden de Fabricación ingresada.');
+    DataModule1.ADOQueryTotalLab.First; // Volver al primer registro si no se encuentra
+  end;
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// B O T O N   I R   A L   P R I M E R   R E G I S T R O
+
+procedure TFormConsultasDetalle.BtnPrimerRegistroClick(Sender: TObject);
+begin
+  CargarPrimerRegistro; // Llamar al procedimiento para cargar el primer registro
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// B O T O N   I R   A L   R E G I S T R O   A N T E R I O R
+
+procedure TFormConsultasDetalle.BtnRegistroAnteriorClick(Sender: TObject);
+begin
+  CargarRegistroAnterior;
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// B O T O N   I R   A L   R E G I S T R O   S I G U I E N T E
+
+procedure TFormConsultasDetalle.BtnRegistroSiguienteClick(Sender: TObject);
+begin
+  CargarRegistroSiguiente;
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// B O T O N   I R   A L   U L T I M O   R E G I S T R O
+
+procedure TFormConsultasDetalle.BtnUltimoRegistroClick(Sender: TObject);
+begin
+  CargarUltimoRegistro;
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// C A R G A   D A T O S   D E S D E    B A T C H T A B L E
+
+procedure TFormConsultasDetalle.CargarDatosBatchTable(OrdenFab: string);
+begin
+  try
+    // Cerrar la consulta y limpiar SQL
+    DataModule1.ADOQueryBatchTable.Close;
+    DataModule1.ADOQueryBatchTable.SQL.Clear;
+    // Define la consulta con un parámetro nombrado
+    DataModule1.ADOQueryBatchTable.SQL.Add('SELECT * FROM aditivos.batchtable where OrdenFab like '+QuotedStr(OrdenFab+'%'));
+    DataModule1.ADOQueryBatchTable.Open;
+  except
+    on E: Exception do
+    begin
+      ShowMessage('Error al cargar datos de BatchTable: ' + E.Message);
+    end;
+  end;
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// C A R G A   D A T O S   A L   A B R I R   F O R M
+
+procedure TFormConsultasDetalle.FormShow(Sender: TObject);
+begin
+  // Cargar todos los registros de TotalLab al abrir el formulario
+  DataModule1.ADOQueryTotalLab.Close;
+  DataModule1.ADOQueryTotalLab.SQL.Clear;
+  DataModule1.ADOQueryTotalLab.SQL.Add('SELECT * FROM TotalLab');
+  DataModule1.ADOQueryTotalLab.Open;
+
+  // Ir al primer registro y actualizar los campos
+  if not DataModule1.ADOQueryTotalLab.IsEmpty then
+    ActualizarCamposDesdeTotalLab;
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// C A R G A   P R I M E R   R E G I S T R O
+
+procedure TFormConsultasDetalle.CargarPrimerRegistro;
+begin
+  if not DataModule1.ADOQueryTotalLab.IsEmpty then
+  begin
+    DataModule1.ADOQueryTotalLab.First;
+    ActualizarCamposDesdeTotalLab;
+  end
+  else
+    ShowMessage('No hay registros en TotalLab.');
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// C A R G A   R E G I S T R O   A N T E R I O R
+
+procedure TFormConsultasDetalle.CargarRegistroAnterior;
+begin
+  if not DataModule1.ADOQueryTotalLab.Bof then // Verificar que no esté en el primer registro
+  begin
+    DataModule1.ADOQueryTotalLab.Prior; // Ir al registro anterior
+    ActualizarCamposDesdeTotalLab; // Llamar a la función para actualizar los campos
+  end
+  else
+    ShowMessage('Ya estás en el primer registro.');
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// C A R G A   R E G I S T R O   S I G U I E N T E
+
+procedure TFormConsultasDetalle.CargarRegistroSiguiente;
+begin
+  if not DataModule1.ADOQueryTotalLab.Eof then // Verificar que no esté en el último registro
+  begin
+    DataModule1.ADOQueryTotalLab.Next; // Ir al registro siguiente
+    //Edit1.Text := DataModule1.ADOQueryTotalLab.FieldByName('OrdenFab').AsString;
+    ActualizarCamposDesdeTotalLab; // Llamar a la función para actualizar los campos
+  end
+  else
+    ShowMessage('Ya estás en el último registro.');
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// C A R G A   U L T I M O   R E G I S T R O
+
+procedure TFormConsultasDetalle.CargarUltimoRegistro;
+begin
+  // Ir al último registro
+  DataModule1.ADOQueryTotalLab.Last; 
+  ActualizarCamposDesdeTotalLab; // Llamar a la función para actualizar los campos
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// A C T U A L I Z A   D A T O S   D E   T O T A L L A B
+
+procedure TFormConsultasDetalle.ActualizarCamposDesdeTotalLab;
+var
+  OrdenFab: string;
+begin
+  EditOrdenFab.Text := DataModule1.ADOQueryTotalLab.FieldByName('OrdenFab').AsString;
+  EditSumCantTeorica.Text := DataModule1.ADOQueryTotalLab.FieldByName('SumCantTeorica').AsString;
+  EditSumCantReal.Text := DataModule1.ADOQueryTotalLab.FieldByName('SumCantReal').AsString;
+  EditDensidad.Text := DataModule1.ADOQueryTotalLab.FieldByName('Densidad').AsString;
+  EditVolTeorico.Text := DataModule1.ADOQueryTotalLab.FieldByName('VolTeorico').AsString;
+  EditVolReal.Text := DataModule1.ADOQueryTotalLab.FieldByName('VolReal').AsString;
+
+  OrdenFab := DataModule1.ADOQueryTotalLab.FieldByName('OrdenFab').AsString;
+  CargarDatosBatchTable(OrdenFab);
+end;
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// P E R M I T E   B U S C A R   A L   D A R   E N T E R
+// E N   L A   C A S I L L A   E D I T O R D E N F A B
+
+procedure TFormConsultasDetalle.EditOrdenFabEnter(Sender: TObject);
+begin
+  BtnBuscarClick(Sender); // Llama al método de búsqueda
+end;
+
+end.

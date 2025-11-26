@@ -1,0 +1,206 @@
+unit FmLaboratorio;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ADODB, FmConsulta, ExtCtrls, MATH, Buttons;
+
+type
+  TFormLaboratorio = class(TForm)
+    GroupBox1: TGroupBox;
+    Label1: TLabel;
+    EditOrdenFab: TEdit;
+    BtnBuscar: TButton;
+    GroupBox2: TGroupBox;
+    Label3: TLabel;
+    EditSumCantTeorica: TEdit;
+    EditVolTeorico: TEdit;
+    EditDensidad: TEdit;
+    EditSumCantReal: TEdit;
+    EditVolReal: TEdit;
+    Label2: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Image1: TImage;
+    Image2: TImage;
+    BtnEdit: TSpeedButton;
+    BtnGuardar: TSpeedButton;
+    procedure BtnBuscarClick(Sender: TObject);
+    procedure BtnGuardarClick(Sender: TObject);
+    procedure CargarDatos;
+    procedure BtnEditClick(Sender: TObject);
+  private
+    //ADOQueryBuscar: TADOQuery;
+    //ADOQueryActualizar: TADOQuery; 
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormLaboratorio: TFormLaboratorio;
+
+implementation
+
+uses FmConexion;
+
+{$R *.dfm}
+
+procedure TFormLaboratorio.BtnBuscarClick(Sender: TObject);
+begin
+
+  CargarDatos; // Llama al método para cargar datos
+
+  //DataModule1.ADOQueryBuscar.SQL.Clear;
+  //DataModule1.ADOQueryBuscar.SQL.Add('SELECT * FROM TotalLab WHERE OrdenFab = :OrdenFab');
+  //DataModule1.ADOQueryBuscar.Parameters.ParamByName('OrdenFab').Value := EditOrdenFab.Text;
+
+  //try
+  //  DataModule1.ADOQueryBuscar.Open;
+  //  if not DataModule1.ADOQueryBuscar.IsEmpty then
+  //  begin
+      // Cargar datos en los campos
+  //    EditSumCantTeorica.Text := DataModule1.ADOQueryBuscar.FieldByName('SumCantTeorica').AsString;
+  //    EditSumCantReal.Text := DataModule1.ADOQueryBuscar.FieldByName('SumCantReal').AsString;
+  //    EditDensidad.Text := DataModule1.ADOQueryBuscar.FieldByName('Densidad').AsString;
+
+      // Calcular VolTeorico y VolReal
+  //    EditVolTeorico.Text := FloatToStr(StrToFloat(EditSumCantTeorica.Text) * StrToFloat(EditDensidad.Text));
+  //    EditVolReal.Text := FloatToStr(StrToFloat(EditSumCantReal.Text) * StrToFloat(EditDensidad.Text));
+  //  end
+  //  else
+  //  begin
+  //    ShowMessage('Orden de fabricación no encontrada.');
+  //  end;
+  //except
+  //  on E: Exception do
+  //    ShowMessage('Error al buscar: ' + E.Message);
+  //end;
+end;
+
+procedure TFormLaboratorio.BtnGuardarClick(Sender: TObject);
+var
+  VolTeorico, VolReal: Double;
+  MsgResult: Integer;
+  SQLQuery: string;
+begin
+  try
+    // Validar las entradas
+    if Trim(EditDensidad.Text) = '' then
+      raise Exception.Create('El campo Densidad no puede estar vacío.');
+    if Trim(EditSumCantTeorica.Text) = '' then
+      raise Exception.Create('El campo Cantidad Teórica no puede estar vacío.');
+    if Trim(EditSumCantReal.Text) = '' then
+      raise Exception.Create('El campo Cantidad Real no puede estar vacío.');
+    if Trim(EditOrdenFab.Text) = '' then
+      raise Exception.Create('El campo Orden de Fabricación no puede estar vacío.');
+
+    // Calcular VolTeorico y VolReal
+    VolTeorico := StrToFloat(EditSumCantTeorica.Text) / StrToFloat(EditDensidad.Text);
+    VolReal := StrToFloat(EditSumCantReal.Text) / StrToFloat(EditDensidad.Text);
+
+    // Redondear a dos decimales
+    VolTeorico := RoundTo(VolTeorico, -2);
+    VolReal := RoundTo(VolReal, -2);
+
+    // Confirmar cambios
+    MsgResult := MessageDlg(
+      Format('¿Desea guardar los siguientes cambios?' + sLineBreak +
+             'Densidad: %.2f' + sLineBreak +
+             'VolTeorico: %.2f' + sLineBreak +
+             'VolReal: %.2f',
+             [StrToFloat(EditDensidad.Text), VolTeorico, VolReal]),
+      mtConfirmation, [mbYes, mbNo], 0);
+
+    if MsgResult = mrYes then
+    begin
+      // Construir la consulta SQL con parámetros embebidos
+      SQLQuery := Format(
+        'UPDATE TotalLab SET Densidad = %.2f, VolTeorico = %.2f, VolReal = %.2f WHERE OrdenFab = %s',
+        [StrToFloat(EditDensidad.Text), VolTeorico, VolReal, QuotedStr(Trim(EditOrdenFab.Text))]);
+
+      // Ejecutar la consulta
+      DataModule1.ADOQueryActualizar.Close;
+      DataModule1.ADOQueryActualizar.SQL.Clear;
+      DataModule1.ADOQueryActualizar.SQL.Add(SQLQuery);
+
+      try
+        DataModule1.ADOQueryActualizar.ExecSQL;
+        ShowMessage('Datos actualizados correctamente.');
+        CargarDatos; // Recargar los datos originales
+      except
+        on E: Exception do
+          ShowMessage('Error al actualizar: ' + E.Message);
+      end;
+    end
+    else
+    begin
+      ShowMessage('Los cambios han sido rechazados.');
+      CargarDatos; // Recargar datos originales
+    end;
+
+    Btnguardar.Enabled := False;
+    EditDensidad.Enabled := False;
+
+  except
+    on E: Exception do
+      ShowMessage('Error: ' + E.Message);
+  end;
+end;
+
+procedure TFormLaboratorio.CargarDatos;
+var
+  Lote: string;
+  VolTeorico, VolReal: Double;
+begin
+  Lote := Trim(EditOrdenFab.Text); // Obtener el texto y eliminar espacios
+
+  // Validar que el campo no esté vacío
+  if Lote = '' then
+  begin
+    ShowMessage('Por favor, ingrese una Orden de Fabricación válida.');
+    Exit; // Salir del procedimiento si la validación falla
+  end;
+
+  // Si la validación es correcta, proceder a buscar y cargar los datos
+  DataModule1.ADOQueryBuscar.SQL.Clear;
+  DataModule1.ADOQueryBuscar.SQL.Add('SELECT * FROM TotalLab where OrdenFab like '+QuotedStr(Lote+'%'));
+  //DataModule1.ADOQueryBuscar.SQL.Add('SELECT * FROM TotalLab WHERE OrdenFab = :OrdenFab');
+  //DataModule1.ADOQueryBuscar.Parameters.ParamByName('OrdenFab').Value := OrdenFab; // Usar el valor como texto
+
+  try
+    DataModule1.ADOQueryBuscar.Open;
+    if not DataModule1.ADOQueryBuscar.IsEmpty then
+    begin
+      // Cargar datos en los campos
+      EditSumCantTeorica.Text := DataModule1.ADOQueryBuscar.FieldByName('SumCantTeorica').AsString;
+      EditSumCantReal.Text := DataModule1.ADOQueryBuscar.FieldByName('SumCantReal').AsString;
+      EditDensidad.Text := DataModule1.ADOQueryBuscar.FieldByName('Densidad').AsString;
+
+      // Recalcular VolTeorico y VolReal
+      VolTeorico := StrToFloat(EditSumCantTeorica.Text) / StrToFloat(EditDensidad.Text);
+      VolReal := StrToFloat(EditSumCantReal.Text) / StrToFloat(EditDensidad.Text);
+
+      // Asignar los valores formateados a los TEdit
+      EditVolTeorico.Text := FormatFloat('0.00', VolTeorico); // Muestra con 2 decimales
+      EditVolReal.Text := FormatFloat('0.00', VolReal); // Muestra con 2 decimales
+    end
+    else
+    begin
+      ShowMessage('Orden de fabricación no encontrada.');
+    end;
+  except
+    on E: Exception do
+      ShowMessage('Error al cargar datos: ' + E.Message);
+  end;
+end;
+procedure TFormLaboratorio.BtnEditClick(Sender: TObject);
+begin
+Btnguardar.Enabled := True;
+EditDensidad.Enabled := True;
+end;
+
+end.

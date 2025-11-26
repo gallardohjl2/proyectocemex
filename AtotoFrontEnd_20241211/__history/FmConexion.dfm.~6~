@@ -1,0 +1,194 @@
+object DataModule1: TDataModule1
+  Height = 473
+  Width = 776
+  PixelsPerInch = 120
+  object ADOConnection1: TADOConnection
+    ConnectionString = 
+      'Provider=MSDASQL.1;Persist Security Info=False;User ID=root;Exte' +
+      'nded Properties="DATABASE=aditivos;DB=aditivos;DESCRIPTION={Cone' +
+      'xi'#243'n a MySQL Aditivos};DSN=DBAditivos32;NO_SCHEMA=1;PASSWORD=123' +
+      '45;PORT=3306;SERVER=localhost;UID=root;USER=root"'
+    LoginPrompt = False
+    Provider = 'MSDASQL.1'
+    Left = 290
+    Top = 30
+  end
+  object ADOQuery1: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    Left = 230
+    Top = 180
+  end
+  object ADOTableEmpleados: TADOTable
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    TableName = 'Empleados'
+    Left = 90
+    Top = 120
+  end
+  object ADOQueryLogin: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 100
+    Top = 180
+  end
+  object ADOQueryBuscar: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 340
+    Top = 180
+  end
+  object ADOQueryActualizar: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 340
+    Top = 260
+  end
+  object ADOQueryTotalLab: TADOQuery
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM TotalLab')
+    Left = 460
+    Top = 120
+    object ADOQueryTotalLabLote: TWideStringField
+      FieldName = 'Lote'
+      FixedChar = True
+      Size = 12
+    end
+    object ADOQueryTotalLabSumCantTeorica: TBCDField
+      FieldName = 'SumCantTeorica'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryTotalLabSumCantReal: TBCDField
+      FieldName = 'SumCantReal'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryTotalLabDensidad: TBCDField
+      FieldName = 'Densidad'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryTotalLabVolTeorico: TBCDField
+      FieldName = 'VolTeorico'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryTotalLabVolReal: TBCDField
+      FieldName = 'VolReal'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryTotalLabFecha: TDateField
+      FieldName = 'Fecha'
+    end
+    object ADOQueryTotalLabHora: TWideStringField
+      FieldName = 'Hora'
+      FixedChar = True
+      Size = 5
+    end
+    object ADOQueryTotalLabOrdenFab: TIntegerField
+      FieldName = 'OrdenFab'
+    end
+    object ADOQueryTotalLabCodigoSAP: TIntegerField
+      FieldName = 'CodigoSAP'
+    end
+    object ADOQueryTotalLabSPare: TWideStringField
+      FieldName = 'SPare'
+      Size = 100
+    end
+  end
+  object ADOQueryBatchTable: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 470
+    Top = 180
+  end
+  object ADOQueryEmpleados: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM Empleados')
+    Left = 470
+    Top = 270
+    object ADOQueryEmpleadosDataUser: TStringField
+      FieldName = 'DataUser'
+      FixedChar = True
+      Size = 10
+    end
+    object ADOQueryEmpleadosDataPassword: TBlobField
+      FieldName = 'DataPassword'
+    end
+    object ADOQueryEmpleadosNombre: TStringField
+      FieldName = 'Nombre'
+      FixedChar = True
+    end
+  end
+  object ADOQueryEmpleadoUpdate: TADOQuery
+    Connection = ADOConnection1
+    Parameters = <>
+    Left = 470
+    Top = 360
+  end
+  object ADOQueryOrdenFab: TADOQuery
+    Connection = ADOConnection1
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM totallab')
+    Left = 600
+    Top = 120
+    object ADOQueryOrdenFabLote: TWideStringField
+      FieldName = 'Lote'
+      FixedChar = True
+      Size = 12
+    end
+    object ADOQueryOrdenFabSumCantTeorica: TBCDField
+      FieldName = 'SumCantTeorica'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryOrdenFabSumCantReal: TBCDField
+      FieldName = 'SumCantReal'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryOrdenFabDensidad: TBCDField
+      FieldName = 'Densidad'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryOrdenFabVolTeorico: TBCDField
+      FieldName = 'VolTeorico'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryOrdenFabVolReal: TBCDField
+      FieldName = 'VolReal'
+      Precision = 18
+      Size = 2
+    end
+    object ADOQueryOrdenFabFecha: TDateField
+      FieldName = 'Fecha'
+    end
+    object ADOQueryOrdenFabHora: TWideStringField
+      FieldName = 'Hora'
+      FixedChar = True
+      Size = 5
+    end
+    object ADOQueryOrdenFabOrdenFab: TIntegerField
+      FieldName = 'OrdenFab'
+    end
+    object ADOQueryOrdenFabCodigoSAP: TIntegerField
+      FieldName = 'CodigoSAP'
+    end
+    object ADOQueryOrdenFabSPare: TWideStringField
+      FieldName = 'SPare'
+      Size = 100
+    end
+  end
+end

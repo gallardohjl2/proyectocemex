@@ -1,0 +1,74 @@
+unit FmLogin;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ADODB, VariablesGlobales;
+
+type
+  TFormLogin = class(TForm)
+    TxtLogin: TEdit;
+    TxtPassword: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    BtnLogin: TButton;
+    BtnCancel: TButton;
+    procedure BtnLoginClick(Sender: TObject);
+  private
+    { Private declarations }
+    //ADOQueryLogin: TADOQuery;
+  public
+    { Public declarations }
+  end;
+
+var
+  FormLogin: TFormLogin;
+
+implementation
+
+uses FmConexion, FmMenu;
+
+{$R *.dfm}
+
+procedure TFormLogin.BtnLoginClick(Sender: TObject);
+var
+  user, pass: string;
+  Query: String;
+  MainForm: TFormMenu;
+
+begin
+  // Obtener el usuario y la contraseña
+  user := TxtLogin.Text;
+  pass := TxtPassword.Text;
+
+  // Consulta SQL (considera usar parámetros para mayor seguridad)
+ Query := Format('SELECT * FROM empleados WHERE DataUser = ''%s'' AND DataPassword = ''%s''', [user, pass]);
+
+  // Ejecutar consulta
+  with DataModule1.ADOQueryLogin do
+  begin
+    Close;
+    SQL.Clear;
+    SQL.Add(Query);
+    Open;
+
+    if RecordCount > 0 then
+    begin
+      //Application.MessageBox('¡Inicio de sesión exitoso!', 'Éxito', MB_OK or MB_ICONINFORMATION);
+      // Cerrar LoginFM si el login es exitoso
+      VariablesGlobales.UsuarioActual := TxtLogin.Text;
+
+      // Acceder al formulario principal y actualizar el nombre de usuario
+      MainForm := TFormMenu(Application.MainForm);
+      MainForm.UpdateUserName; 
+
+      ModalResult := mrOk;
+    end
+    else
+    begin
+      Application.MessageBox('Usuario o contraseña incorrectos.', 'Error', MB_OK or MB_ICONERROR);
+    end;
+  end;
+end;
+end.

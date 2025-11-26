@@ -1,0 +1,145 @@
+unit FmOrdenesFab;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls, DB, Grids, DBGrids, ActiveX, ComObj,
+  ExtCtrls, Buttons, VariablesGlobales;
+
+type
+  TFormOrdenesFab = class(TForm)
+    Label3: TLabel;
+    Image1: TImage;
+    Image2: TImage;
+    GroupBox2: TGroupBox;
+    BtnExportXls: TSpeedButton;
+    GroupBox1: TGroupBox;
+    Label4: TLabel;
+    Label1: TLabel;
+    TxtFechaInicio: TDateTimePicker;
+    TxtFechaFin: TDateTimePicker;
+    BtnBuscar: TButton;
+    DBGridOF: TDBGrid;
+    DataSourceOF: TDataSource;
+    Label2: TLabel;
+    procedure BtnBuscarClick(Sender: TObject);
+    procedure BtnExportXlsClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FormOrdenesFab: TFormOrdenesFab;
+
+implementation
+
+uses FmConexion;
+
+{$R *.dfm}
+
+procedure TFormOrdenesFab.BtnBuscarClick(Sender: TObject);
+var
+  DateValueInicio, DateValueFin: TDateTime;
+begin
+  DateValueInicio := TxtFechaInicio.Date;
+  DateValueFin := TxtFechaFin.Date;
+
+  try
+    // Verifica que la fecha final no sea menor que la inicial
+    if DateValueFin < DateValueInicio then
+    begin
+      ShowMessage('La fecha final no puede ser menor que la fecha inicial.');
+      Exit; // Salir si las fechas no son válidas
+    end;
+
+    // Verifica que la conexión esté abierta
+    if not DataModule1.ADOConnection1.Connected then
+      DataModule1.ADOConnection1.Open;
+
+    // Prepara la consulta
+    DataModule1.ADOQueryOrdenFab.Close;
+    DataModule1.ADOQueryOrdenFab.SQL.Clear;
+
+    // Modifica la consulta para que considere solo la fecha
+
+    DataModule1.ADOQueryOrdenFab.SQL.Add('SELECT * FROM totallab ');
+    DataModule1.ADOQueryOrdenFab.SQL.Add('WHERE CAST(Fecha AS DATE) between '+QuotedStr(formatdatetime('yyyy/mm/dd', DateValueInicio))+' AND '+QuotedStr(formatdatetime('yyyy/mm/dd', DateValueFin)));
+    //DataModule1.ADOQueryOrdenFab.SQL.Add('SELECT * FROM TotalLab WHERE CAST(Fecha AS DATE) >= :FechaInicio AND CAST(Fecha AS DATE) <= :FechaFin');
+
+    // Asigna parámetros
+    //DataModule1.ADOQueryOrdenFab.Parameters.ParamByName('FechaInicio').Value := DateValueInicio;
+    //DataModule1.ADOQueryOrdenFab.Parameters.ParamByName('FechaFin').Value := DateValueFin;
+
+    // Ejecuta la consulta
+    DataModule1.ADOQueryOrdenFab.Open;
+
+    // Actualiza el DBGrid
+    DataSourceOF.DataSet := DataModule1.ADOQueryOrdenFab;
+    DBGridOF.DataSource := DataSourceOF;
+
+    if DataModule1.ADOQueryOrdenFab.RecordCount = 0 then
+      ShowMessage('No hay registros disponibles.');
+
+  except
+    on E: Exception do
+      ShowMessage('Error: ' + E.Message);
+  end;
+end;
+
+procedure TFormOrdenesFab.BtnExportXlsClick(Sender: TObject);
+var
+  ExcelApp: OLEVariant;
+  HeaderRange: OLEVariant;
+  i, j: Integer;
+begin
+  try
+    // Inicializa OLE
+    CoInitialize(nil);
+    try
+      // Crea una nueva instancia de Excel
+      ExcelApp := CreateOleObject('Excel.Application');
+      try
+        ExcelApp.Visible := True; // Muestra Excel
+
+        // Agrega un nuevo libro
+        ExcelApp.Workbooks.Add;
+
+        // Escribir encabezados
+        for i := 0 to DataModule1.ADOQueryOrdenFab.FieldCount - 1 do
+          ExcelApp.Cells[1, i + 1] := DataModule1.ADOQueryOrdenFab.Fields[i].FieldName;
+
+        // Escribir datos
+        DataModule1.ADOQueryOrdenFab.First; // Comienza desde el primer registro
+        for i := 0 to DataModule1.ADOQueryOrdenFab.RecordCount - 1 do
+        begin
+          for j := 0 to DataModule1.ADOQueryOrdenFab.FieldCount - 1 do
+            ExcelApp.Cells[i + 2, j + 1] := DataModule1.ADOQueryOrdenFab.Fields[j].AsString;
+
+          DataModule1.ADOQueryOrdenFab.Next; // Mueve al siguiente registro
+        end;
+
+        // Formatear encabezados
+        HeaderRange := ExcelApp.Range[ExcelApp.Cells[1, 1], ExcelApp.Cells[1, DataModule1.ADOQueryOrdenFab.FieldCount]];
+        HeaderRange.Font.Bold := True;
+        HeaderRange.Interior.Color := $CCCCCC; // Color de fondo gris claro
+
+      finally
+        // Libera el objeto Excel
+        ExcelApp := Unassigned;
+      end;
+
+    finally
+      // Finaliza OLE
+      CoUninitialize;
+    end;
+
+  except
+    on E: Exception do
+      ShowMessage('Error al exportar a Excel: ' + E.Message);
+  end;
+end;
+
+end.
