@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:8.0.39
+    container_name: mysql_8_0_39
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin1234
+    ports:
+      - "3320:3306"
+    volumes:
+      - mysql_data_cemex:/var/lib/mysql   # usa tu volumen existente
+      - ./mysql-init:/docker-entrypoint-initdb.d  # scripts de inicialización
+    
+volumes:
+  mysql_data_cemex:
+    external: true   # indica que el volumen ya existe
